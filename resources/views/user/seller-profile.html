@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aung Kyaw — Seller Profile | Marketly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config={theme:{extend:{colors:{ink:'#121826',mist:'#F6F7FB',cobalt:'#3157E5',lime:'#DDF76F'},boxShadow:{soft:'0 12px 40px rgba(18,24,38,.08)'}}}}}
+  </script>
+</head>
+<body class="bg-mist text-ink">
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+    <a href="index.html" class="flex items-center gap-2 text-xl font-black"><span class="grid h-9 w-9 place-items-center rounded-xl bg-ink text-white">M</span>Marketly</a>
+    <nav class="hidden items-center gap-6 text-sm font-semibold text-slate-600 md:flex">
+      <a href="index.html" class="hover:text-ink">Browse</a>
+      <a href="favorites.html" class="hover:text-ink">Favorites</a>
+      <a href="messages.html" class="hover:text-ink">Messages</a>
+      <a href="my-listings.html" class="hover:text-ink">My Listings</a>
+    </nav>
+    <a href="sell.html" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white">+ Sell item</a>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-5 py-8">
+  <a href="product.html" class="text-sm font-semibold text-slate-500">← Back to listing</a>
+
+  <section class="mt-5 overflow-hidden rounded-3xl bg-white shadow-soft">
+    <div class="h-28 bg-gradient-to-r from-cobalt via-blue-500 to-indigo-400"></div>
+    <div class="px-6 pb-7 sm:px-8">
+      <div class="-mt-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div class="flex items-end gap-4">
+          <img src="assets/avatar-aung.svg" alt="Aung Kyaw profile" class="h-24 w-24 shrink-0 rounded-3xl border-4 border-white object-cover shadow-soft">
+          <div class="pb-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-2xl font-black">Aung Kyaw</h1>
+              <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">✓ Verified seller</span>
+            </div>
+            <p class="mt-1 text-sm text-slate-500">Sanchaung, Yangon · Member since 2024</p>
+          </div>
+        </div>
+
+      </div>
+
+      <a href="conversation.html" class="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-cobalt px-5 py-4 text-base font-black text-white shadow-soft transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/>
+        </svg>
+        Send Message
+      </a>
+
+      <div class="mt-7 grid gap-3 sm:grid-cols-4">
+        <div class="rounded-2xl bg-mist p-4"><p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Active listings</p><p class="mt-2 text-xl font-black">18</p></div>
+        <div class="rounded-2xl bg-mist p-4"><p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Sold</p><p class="mt-2 text-xl font-black">42</p></div>
+        <div class="rounded-2xl bg-mist p-4"><p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Rating</p><p class="mt-2 text-xl font-black">4.9 <span class="text-sm text-amber-500">★</span></p></div>
+        <div class="rounded-2xl bg-mist p-4"><p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Response</p><p class="mt-2 text-xl font-black">~ 1 hour</p></div>
+      </div>
+
+      <div class="mt-6 border-t border-slate-100 pt-5">
+        <h2 class="font-black">About seller</h2>
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Selling well-kept personal items and electronics around Yangon. Happy to answer questions, share extra photos and arrange a public meetup for inspection.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-9">
+    <div class="mb-5 flex items-end justify-between">
+      <div><p class="text-sm font-bold text-cobalt">Seller listings</p><h2 class="text-2xl font-black">Items from Aung Kyaw</h2></div>
+      <select class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"><option>Newest</option><option>Price: low to high</option></select>
+    </div>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <a href="product.html" class="group overflow-hidden rounded-2xl bg-white shadow-soft"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=700&q=80"><div class="p-4"><div class="flex items-center justify-between gap-2"><h3 class="font-bold group-hover:text-cobalt">iPhone 13 · 128GB</h3><span class="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700">Available</span></div><p class="mt-1 text-sm text-slate-500">Like new · Sanchaung</p><p class="mt-4 text-xl font-black">690,000 MMK</p></div></a>
+      <a href="product.html" class="group overflow-hidden rounded-2xl bg-white shadow-soft"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">Sony headphones</h3><p class="mt-1 text-sm text-slate-500">Good · Sanchaung</p><p class="mt-4 text-xl font-black">220,000 MMK</p></div></a>
+      <a href="product.html" class="group overflow-hidden rounded-2xl bg-white shadow-soft"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=80"><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">MacBook sleeve</h3><p class="mt-1 text-sm text-slate-500">Like new · Sanchaung</p><p class="mt-4 text-xl font-black">35,000 MMK</p></div></a>
+      <a href="product.html" class="group overflow-hidden rounded-2xl bg-white shadow-soft"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=700&q=80"><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">Mechanical keyboard</h3><p class="mt-1 text-sm text-slate-500">Good · Sanchaung</p><p class="mt-4 text-xl font-black">85,000 MMK</p></div></a>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-slate-200 bg-white"><div class="mx-auto flex max-w-7xl justify-between px-5 py-7 text-sm text-slate-500"><span>© 2026 Marketly</span><a href="messages.html" class="font-semibold text-cobalt">Messages</a></div></footer>
+</body>
+</html>

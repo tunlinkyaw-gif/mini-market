@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Conversation — Marketly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{ink:'#121826',mist:'#F6F7FB',cobalt:'#3157E5'},boxShadow:{soft:'0 12px 40px rgba(18,24,38,.08)'}}}}}</script>
+</head>
+<body class="bg-mist text-ink">
+<header class="border-b bg-white">
+  <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
+    <a href="messages.html" class="text-sm font-bold">← Messages</a>
+    <a href="index.html" class="font-black">Marketly</a>
+    <a href="product.html" class="text-sm font-bold text-cobalt">View listing</a>
+  </div>
+</header>
+<main class="mx-auto max-w-5xl px-5 py-6">
+  <div class="grid gap-4 lg:grid-cols-[1fr_280px]">
+    <section class="flex h-[76vh] flex-col overflow-hidden rounded-3xl bg-white shadow-soft">
+      <div class="flex items-center justify-between gap-3 border-b p-4">
+        <a href="seller-profile.html" class="flex min-w-0 items-center gap-3">
+          <div class="relative"><img src="assets/avatar-aung.svg" alt="Aung Kyaw profile" class="h-11 w-11 rounded-full object-cover"><span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span></div>
+          <div class="min-w-0"><p class="font-bold">Aung Kyaw</p><p class="truncate text-sm text-slate-500">Active now · View seller profile</p></div>
+        </a>
+        <span class="hidden rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 sm:inline">✓ Verified</span>
+      </div>
+
+      <div id="chatBody" class="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-5">
+        <div class="text-center text-xs font-semibold text-slate-400">Today</div>
+        <div class="max-w-[78%]"><div class="rounded-2xl rounded-tl-sm bg-white p-3 text-sm shadow-sm">Hi, is this still available?</div><p class="mt-1 pl-1 text-[11px] text-slate-400">10:30 AM</p></div>
+        <div class="ml-auto max-w-[78%]"><div class="rounded-2xl rounded-tr-sm bg-cobalt p-3 text-sm text-white">Yes, it’s still available.</div><p class="mt-1 pr-1 text-right text-[11px] text-slate-400">10:32 AM · Seen</p></div>
+        <div class="max-w-[78%]"><div class="rounded-2xl rounded-tl-sm bg-white p-3 text-sm shadow-sm">Can I check it this evening?</div><p class="mt-1 pl-1 text-[11px] text-slate-400">10:36 AM</p></div>
+        <div class="ml-auto max-w-[78%]"><div class="rounded-2xl rounded-tr-sm bg-cobalt p-3 text-sm text-white">Sure. Around 6 PM works.</div><p class="mt-1 pr-1 text-right text-[11px] text-slate-400">10:42 AM · Seen</p></div>
+      </div>
+
+      <form id="messageForm" class="border-t bg-white p-4">
+        <div class="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-cobalt">
+          <button type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg text-slate-500 hover:bg-white">＋</button>
+          <textarea id="messageInput" rows="1" class="max-h-28 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm outline-none" placeholder="Type a message..."></textarea>
+          <button class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white">Send</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="h-fit rounded-3xl bg-white p-4 shadow-soft">
+      <a href="product.html" class="block overflow-hidden rounded-2xl border border-slate-100">
+        <img class="h-40 w-full object-cover" src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=500&q=80">
+        <div class="p-4"><p class="text-xs font-bold text-cobalt">Talking about</p><h2 class="mt-1 font-black">iPhone 13 · 128GB</h2><p class="mt-2 text-lg font-black">690,000 MMK</p><p class="mt-1 text-xs text-slate-500">Like new · Sanchaung</p></div>
+      </a>
+      <div class="mt-4 rounded-2xl bg-mist p-4 text-xs leading-5 text-slate-600"><strong class="text-ink">Safety tip:</strong> Meet in a public place and inspect the item before paying.</div>
+    </aside>
+  </div>
+</main>
+<script>
+const form=document.getElementById('messageForm'), input=document.getElementById('messageInput'), body=document.getElementById('chatBody');
+form.addEventListener('submit',e=>{e.preventDefault();const text=input.value.trim();if(!text)return;const wrap=document.createElement('div');wrap.className='ml-auto max-w-[78%]';wrap.innerHTML=`<div class="rounded-2xl rounded-tr-sm bg-cobalt p-3 text-sm text-white"></div><p class="mt-1 pr-1 text-right text-[11px] text-slate-400">Just now · Sent</p>`;wrap.querySelector('div').textContent=text;body.appendChild(wrap);input.value='';body.scrollTop=body.scrollHeight;});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
+</script>
+</body>
+</html>
