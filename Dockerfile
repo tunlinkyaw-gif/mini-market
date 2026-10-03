@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip
 
-# Install PHP extensions needed for Laravel (Added 'zip' extension)
+# Install PHP extensions needed for Laravel
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
@@ -23,8 +23,7 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . /var/www/html
 
-# Run composer install
-# (Optional: Added --no-scripts to prevent artisan errors if database is not connected during build)
+# Run composer install WITHOUT scripts to prevent database connection errors during build
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Create missing directories and set permissions for Laravel storage and cache
