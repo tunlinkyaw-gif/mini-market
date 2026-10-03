@@ -10,7 +10,7 @@
     <body class="bg-mist text-ink">
         <main class="grid min-h-screen lg:grid-cols-2">
             <section class="hidden bg-ink p-12 text-white lg:flex lg:flex-col lg:justify-between">
-                <a href="index.html" class="text-2xl font-black">Marketly</a>
+                <a href="{{ route('dashboard') }}" class="text-2xl font-black">Marketly</a>
                 <div>
                     <p class="text-sm font-bold uppercase tracking-widest text-slate-400">Simple local marketplace</p>
                     <h1 class="mt-4 max-w-xl text-5xl font-black leading-tight">Find what you need. Sell what you don’t.</h1>
@@ -43,8 +43,8 @@
                         </div>
                             <button class="w-full rounded-2xl bg-ink py-3.5 font-bold text-white">Sign in</button>
                         </form>
-                        <p class="mt-6 text-center text-sm text-slate-500">New to Marketly? 
-                            <a href="/register" class="font-bold text-cobalt">Create account</a>
+                        <p class="mt-6 text-center text-sm text-slate-500">New to Marketly?
+                            <a href="{{ route('register') }}" class="font-bold text-cobalt">Create account</a>
                         </p>
                     </div>
                 </section>

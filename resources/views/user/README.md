@@ -3,16 +3,16 @@
 HTML + Tailwind CSS marketplace prototype.
 
 ## Pages
-- `index.html` — marketplace browse/search/filter
-- `product.html` — product details
-- `seller-profile.html` — public seller profile and seller listings
-- `messages.html` — inbox / message list with search
-- `conversation.html` — buyer-seller message box with demo send interaction
-- `favorites.html` — saved items
-- `my-listings.html` — current user's own listings
-- `sell.html` — create/edit listing UI
-- `login.html` — sign in
-- `register.html` — create account
+- `dashboard.blade.php` — marketplace browse/search/filter
+- `product.blade.php` — product details
+- `seller-profile.blade.php` — public seller profile and seller listings
+- `messages.blade.php` — inbox / message list with search
+- `conversation.blade.php` — buyer-seller message box with demo send interaction
+- `favorites.blade.php` — saved items
+- `my-listings.blade.php` — current user's own listings
+- `sell.blade.php` — create/edit listing UI
+- `loin.blade.php` — sign in
+- `register.blade.php` — create account
 
 ## Seller/message flow
 `Product Detail → View Seller Profile → Message Seller → Conversation`

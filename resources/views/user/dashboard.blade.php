@@ -12,11 +12,21 @@
 <body class="bg-mist text-ink">
 <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-    <a href="index.html" class="flex items-center gap-2 font-black text-xl"><span class="grid h-9 w-9 place-items-center rounded-xl bg-ink text-white">M</span>Marketly</a>
+    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-black text-xl"><span class="grid h-9 w-9 place-items-center rounded-xl bg-ink text-white">M</span>Marketly</a>
     <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600">
-      <a href="index.html" class="text-ink">Browse</a><a href="favorites.html" class="hover:text-ink">Favorites</a><a href="messages.html" class="hover:text-ink">Messages</a><a href="my-listings.html" class="hover:text-ink">My Listings</a>
+      <a href="{{ route('dashboard') }}" class="text-ink">Browse</a>
+      <a href="{{ route('favorites') }}" class="hover:text-ink">Favorites</a>
+      <a href="{{ route('messages') }}" class="hover:text-ink">Messages</a>
+      <a href="{{ route('my-listings') }}" class="hover:text-ink">My Listings</a>
     </nav>
-    <div class="flex items-center gap-3"><a href="login.html" class="hidden sm:inline text-sm font-semibold">Sign in</a><a href="sell.html" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">+ Sell item</a></div>
+    <div class="flex items-center gap-3">
+      <a href="{{ route('login') }}" class="hidden sm:inline text-sm font-semibold">Sign in</a>
+      <a href="{{ route('sell') }}" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">+ Create listing</a>
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">Logout</button>
+      </form>
+    </div>
   </div>
 </header>
 
@@ -27,6 +37,10 @@
       <span class="inline-flex rounded-full bg-lime px-3 py-1 text-xs font-bold uppercase tracking-wide">Buy better. Sell simply.</span>
       <h1 class="mt-5 max-w-3xl text-4xl font-black leading-tight sm:text-6xl">Great finds from people around you.</h1>
       <p class="mt-4 max-w-2xl text-lg text-slate-600">A simple local marketplace for electronics, books, fashion, furniture and more.</p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href="{{ route('sell') }}" class="inline-flex items-center rounded-xl bg-ink px-5 py-3 font-bold text-white shadow-soft hover:bg-slate-800">Create listing</a>
+        <a href="{{ route('my-listings') }}" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-5 py-3 font-bold text-slate-700 hover:bg-slate-50">View my listings</a>
+      </div>
       <div class="mt-7 flex max-w-2xl rounded-2xl border border-slate-200 bg-white p-2 shadow-soft">
         <input id="searchInput" class="min-w-0 flex-1 px-4 py-3 outline-none" placeholder="Search for iPhone, desk, book..." />
         <button id="searchBtn" class="rounded-xl bg-cobalt px-5 py-3 font-bold text-white">Search</button>
@@ -53,14 +67,19 @@
 <section class="mx-auto max-w-7xl px-5 py-8">
   <div class="mb-6 flex items-end justify-between"><div><p class="text-sm font-semibold text-cobalt">Fresh listings</p><h2 class="text-2xl font-black">Explore the marketplace</h2></div><select id="sortSelect" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"><option value="newest">Newest</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></div>
   <div id="productGrid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    <a href="product.html" data-category="electronics" data-price="690000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div class="relative"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=700&q=80"><span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold">Like new</span></div><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">iPhone 13 · 128GB</h3><p class="mt-1 text-sm text-slate-500">Sanchaung · 2h ago</p><p class="mt-4 text-xl font-black">690,000 MMK</p></div></a>
-    <a href="product.html" data-category="furniture" data-price="95000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div class="relative"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=700&q=80"><span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold">Good</span></div><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">Minimal desk chair</h3><p class="mt-1 text-sm text-slate-500">Kamayut · Today</p><p class="mt-4 text-xl font-black">95,000 MMK</p></div></a>
-    <a href="product.html" data-category="books" data-price="28000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div class="relative"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80"><span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold">Good</span></div><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">Programming books bundle</h3><p class="mt-1 text-sm text-slate-500">Hledan · Yesterday</p><p class="mt-4 text-xl font-black">28,000 MMK</p></div></a>
-    <a href="product.html" data-category="fashion" data-price="75000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div class="relative"><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80"><span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold">New</span></div><div class="p-4"><h3 class="font-bold group-hover:text-cobalt">Nike everyday sneakers</h3><p class="mt-1 text-sm text-slate-500">Bahan · 4h ago</p><p class="mt-4 text-xl font-black">75,000 MMK</p></div></a>
-    <a href="product.html" data-category="sports" data-price="120000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=80"></div><div class="p-4"><h3 class="font-bold">Adjustable dumbbells</h3><p class="mt-1 text-sm text-slate-500">Yankin · Today</p><p class="mt-4 text-xl font-black">120,000 MMK</p></div></a>
-    <a href="product.html" data-category="electronics" data-price="220000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80"></div><div class="p-4"><h3 class="font-bold">Sony headphones</h3><p class="mt-1 text-sm text-slate-500">Tamwe · 6h ago</p><p class="mt-4 text-xl font-black">220,000 MMK</p></div></a>
-    <a href="product.html" data-category="furniture" data-price="160000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=700&q=80"></div><div class="p-4"><h3 class="font-bold">Compact study desk</h3><p class="mt-1 text-sm text-slate-500">Ahlone · Yesterday</p><p class="mt-4 text-xl font-black">160,000 MMK</p></div></a>
-    <a href="product.html" data-category="fashion" data-price="45000" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft"><div><img class="h-56 w-full object-cover" src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=700&q=80"></div><div class="p-4"><h3 class="font-bold">Everyday overshirt</h3><p class="mt-1 text-sm text-slate-500">Dagon · 3h ago</p><p class="mt-4 text-xl font-black">45,000 MMK</p></div></a>
+    @foreach ($products as $product)
+      <a href="{{ route('products.show', $product['slug']) }}" data-category="{{ $product['category'] }}" data-price="{{ $product['price'] }}" class="product-card group overflow-hidden rounded-2xl bg-white shadow-soft">
+        <div class="relative">
+          <img class="h-56 w-full object-cover" src="{{ $product['image_url'] ?? $product['image'] }}" alt="{{ $product['name'] }}">
+          <span class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold">{{ $product['status'] }}</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold group-hover:text-cobalt">{{ $product['name'] }}</h3>
+          <p class="mt-1 text-sm text-slate-500">{{ $product['location'] }} · 2h ago</p>
+          <p class="mt-4 text-xl font-black">{{ number_format($product['price']) }} MMK</p>
+        </div>
+      </a>
+    @endforeach
   </div>
   <div id="emptyState" class="hidden rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">No listings found for this filter.</div>
 </section>

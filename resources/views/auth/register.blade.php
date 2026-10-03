@@ -12,7 +12,7 @@
 <body class="bg-mist text-ink">
     <main class="min-h-screen">
         <div class="mx-auto grid min-h-screen max-w-6xl lg:grid-cols-[.8fr_1.2fr]">
-            <aside class="hidden p-10 lg:flex lg:flex-col lg:justify-between"><a href="index.html"
+            <aside class="hidden p-10 lg:flex lg:flex-col lg:justify-between"><a href="{{ route('dashboard') }}"
                     class="text-2xl font-black">Marketly</a>
                 <div class="rounded-3xl bg-cobalt p-8 text-white">
                     <p class="text-sm font-bold uppercase tracking-widest text-blue-100">One account</p>
@@ -59,7 +59,7 @@
                                 @error('location')
                         <div class="text-red-500">{{$message}}</div>
                         @enderror</div>
-                                
+
                         <div>
                             <label class="font-bold">Password</label>
                             <input type="password" name="password" value="{{old('password')}}" class="mt-2 w-full rounded-2xl border bg-white px-4 py-3" placeholder="••••••••">
@@ -67,7 +67,7 @@
                         <div class="text-red-500" >{{$message}}</div>
                         @enderror
                     </div>
-                                
+
                         <div>
                             <label class="font-bold" >Confirm password</label>
                             <input type="password" name="password_confirmation" value="{{old('password_confirmation')}}" class="mt-2 w-full rounded-2xl border bg-white px-4 py-3" placeholder="••••••••">
@@ -76,7 +76,7 @@
                         @enderror</div>
                         <button class="sm:col-span-2 rounded-2xl bg-ink py-3.5 font-bold text-white">Create account</button>
                     </form>
-                    <p class="mt-6 text-sm text-slate-500">Already have an account? <a href="/login"
+                    <p class="mt-6 text-sm text-slate-500">Already have an account? <a href="{{ route('login') }}"
                             class="font-bold text-cobalt">Sign in</a></p>
                 </div>
             </section>

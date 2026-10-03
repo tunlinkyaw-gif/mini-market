@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    //Register page. 
+    //Register page.
     public function registerPage (){
         return view ('auth.register');
     }
-     //Register. 
+     //Register.
      public function register(Request $request){
 
      $request->validate([
@@ -25,14 +26,14 @@ class AuthController extends Controller
        User::create([
         'name'=>$request->name,
         'email'=>$request->email,
-        'password'=>$request->password,
+        'password'=>Hash::make($request->password),
         'location'=>$request->location,
         'phone'=>$request->phone,
        ]);
 
        return to_route('login');
      }
-    
+
 
     //login page
     public function loginPage (){
@@ -43,16 +44,26 @@ class AuthController extends Controller
     {
         $credentials=$request->validate([
             'email' => 'required|email',
-            'password'=>'required|string',   
+            'password'=>'required|string',
          ]);
          if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
- 
-            return redirect()->intended('admin\dashboard');
+
+            return redirect()->intended(route('dashboard'));
         }
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
     }
-    
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+
 }
