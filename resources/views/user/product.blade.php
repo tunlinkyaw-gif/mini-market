@@ -26,6 +26,8 @@
 <body class="bg-mist text-ink">
     @php
         $productImage = $product['image_url'] ?? $product['image'];
+        $productImages = $product['gallery_urls'] ?? [$productImage];
+        $productImages = $productImages ?: [$productImage];
         $postedDate = ! empty($product['created_at'])
             ? \Illuminate\Support\Carbon::parse($product['created_at'])->format('M j, Y')
             : 'Featured listing';
@@ -49,7 +51,16 @@
 
         <div class="mt-5 grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
             <div>
-                <img id="mainImage" class="h-[420px] w-full rounded-3xl object-cover sm:h-[520px]" src="{{ $productImage }}" alt="{{ $product['name'] }}">
+                <img id="mainImage" class="h-[420px] w-full rounded-3xl object-cover sm:h-[520px]" src="{{ $productImages[0] }}" alt="{{ $product['name'] }}">
+                @if (count($productImages) > 1)
+                    <div class="mt-3 grid grid-cols-4 gap-3">
+                        @foreach ($productImages as $galleryImage)
+                            <button type="button" data-image="{{ $galleryImage }}" aria-label="View product photo {{ $loop->iteration }}" class="gallery-thumb overflow-hidden rounded-xl border-2 {{ $loop->first ? 'border-ink' : 'border-transparent' }}">
+                                <img class="h-20 w-full object-cover sm:h-24" src="{{ $galleryImage }}" alt="{{ $product['name'] }} photo {{ $loop->iteration }}">
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             <aside class="space-y-5">
@@ -81,7 +92,11 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('messages.show', $seller['id']) }}" class="mt-6 block rounded-2xl bg-cobalt px-5 py-3.5 text-center font-bold text-white">Message seller</a>
+                    @if ($isOwner)
+                        <a href="{{ route('listings.edit', $product['id']) }}" class="mt-6 block rounded-2xl bg-ink px-5 py-3.5 text-center font-bold text-white">Edit listing</a>
+                    @else
+                        <a href="{{ route('messages.show', $seller['id']) }}" class="mt-6 block rounded-2xl bg-cobalt px-5 py-3.5 text-center font-bold text-white">Message seller</a>
+                    @endif
                 </section>
 
                 <section class="rounded-3xl bg-white p-6 shadow-soft">
@@ -113,6 +128,20 @@
             </div>
         </section>
     </main>
+    <script>
+        const mainImage = document.getElementById('mainImage');
 
+        document.querySelectorAll('.gallery-thumb').forEach((thumbnail) => {
+            thumbnail.addEventListener('click', () => {
+                mainImage.src = thumbnail.dataset.image;
+                document.querySelectorAll('.gallery-thumb').forEach((item) => {
+                    item.classList.remove('border-ink');
+                    item.classList.add('border-transparent');
+                });
+                thumbnail.classList.remove('border-transparent');
+                thumbnail.classList.add('border-ink');
+            });
+        });
+    </script>
 </body>
 </html>

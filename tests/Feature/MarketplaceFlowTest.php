@@ -57,6 +57,86 @@ test('product detail page shows the listing and seller information', function ()
         ->assertSee(route('seller.profile', $this->user->id));
 });
 
+test('listing owners see an edit action instead of a message seller action', function () {
+    $product = Product::createListing([
+        'name' => 'My own camera',
+        'category' => 'electronics',
+        'price' => 420000,
+        'location' => 'Bahan',
+        'description' => 'My camera listing.',
+    ]);
+
+    $this->get(route('products.show', $product->slug))
+        ->assertSee('Edit listing')
+        ->assertSee(route('listings.edit', $product->id))
+        ->assertDontSee('Message seller');
+});
+
+test('buyers see the message seller action on another users listing', function () {
+    $seller = User::factory()->create(['location' => 'Yangon']);
+    $product = Product::createListing([
+        'name' => 'Seller camera',
+        'category' => 'electronics',
+        'price' => 420000,
+        'location' => 'Bahan',
+        'description' => 'A seller camera listing.',
+        'seller_id' => $seller->id,
+    ]);
+
+    $this->get(route('products.show', $product->slug))
+        ->assertSee('Message seller')
+        ->assertSee(route('messages.show', $seller->id));
+});
+
+test('seller profile shows that sellers real details and only their listings', function () {
+    $seller = User::factory()->create([
+        'name' => 'Aung Kyaw',
+        'location' => 'Sanchaung, Yangon',
+    ]);
+    Product::createListing([
+        'name' => 'Seller active listing',
+        'category' => 'electronics',
+        'price' => 220000,
+        'location' => 'Sanchaung',
+        'description' => 'Available from this seller.',
+        'seller_id' => $seller->id,
+    ]);
+    Product::createListing([
+        'name' => 'Seller sold listing',
+        'category' => 'electronics',
+        'price' => 180000,
+        'location' => 'Sanchaung',
+        'description' => 'Sold by this seller.',
+        'seller_id' => $seller->id,
+        'listing_status' => 'Sold',
+    ]);
+    Product::createListing([
+        'name' => 'Different user listing',
+        'category' => 'books',
+        'price' => 10000,
+        'location' => 'Yangon',
+        'description' => 'Must not appear on this profile.',
+        'seller_id' => $this->user->id,
+    ]);
+
+    $this->get(route('seller.profile', $seller->id))
+        ->assertSee('Aung Kyaw')
+        ->assertSee('Sanchaung, Yangon')
+        ->assertSee('Active listings')
+        ->assertSee('Seller active listing')
+        ->assertSee('Seller sold listing')
+        ->assertSee(route('messages.show', $seller->id))
+        ->assertDontSee('Different user listing');
+});
+
+test('seller profile owner sees manage listings and an honest empty state', function () {
+    $this->get(route('seller.profile', $this->user->id))
+        ->assertSee('Manage my listings')
+        ->assertSee(route('my-listings'))
+        ->assertSee('This seller has no listings yet.')
+        ->assertDontSee('Send Message');
+});
+
 test('users can save and remove products from favorites', function () {
     $product = Product::createListing([
         'name' => 'Favorite camera',
@@ -236,12 +316,13 @@ test('users can publish a new listing from the sell page', function () {
         ->and($products[0]['name'])->toBe('Gaming headset');
 });
 
-test('users can upload a listing photo that appears on product pages', function () {
+test('users can upload four listing photos that appear on product pages', function () {
     Storage::fake('public');
 
     $this->get('/sell')
         ->assertSee('enctype="multipart/form-data"', false)
-        ->assertSee('type="file"', false);
+        ->assertSee('name="images[]"', false)
+        ->assertSee('multiple', false);
 
     $this->post('/sell', [
         'name' => 'Photo lamp',
@@ -249,30 +330,71 @@ test('users can upload a listing photo that appears on product pages', function 
         'price' => 30000,
         'location' => 'Bahan',
         'description' => 'A lamp with an uploaded image.',
-        'image' => UploadedFile::fake()->image('lamp.jpg'),
+        'images' => [
+            UploadedFile::fake()->image('lamp-front.jpg'),
+            UploadedFile::fake()->image('lamp-side.jpg'),
+            UploadedFile::fake()->image('lamp-detail.jpg'),
+            UploadedFile::fake()->image('lamp-label.jpg'),
+        ],
     ])->assertRedirect('/my-listings');
 
     $product = Product::query()->where('name', 'Photo lamp')->firstOrFail();
-    $imagePath = $product->getRawOriginal('image');
+    $imagePaths = $product->images()->orderBy('position')->pluck('path')->all();
 
-    Storage::disk('public')->assertExists($imagePath);
+    expect($imagePaths)->toHaveCount(4);
+    foreach ($imagePaths as $imagePath) {
+        Storage::disk('public')->assertExists($imagePath);
+    }
 
     $this->get(route('products.show', $product->slug))
-        ->assertSee(Storage::disk('public')->url($imagePath));
+        ->assertSee(Storage::disk('public')->url($imagePaths[0]))
+        ->assertSee(Storage::disk('public')->url($imagePaths[1]))
+        ->assertSee(Storage::disk('public')->url($imagePaths[2]))
+        ->assertSee(Storage::disk('public')->url($imagePaths[3]));
+});
+
+test('listing uploads reject more than four photos', function () {
+    Storage::fake('public');
+
+    $this->from('/sell')->post('/sell', [
+        'name' => 'Too many photos',
+        'category' => 'furniture',
+        'price' => 30000,
+        'location' => 'Bahan',
+        'description' => 'This listing has too many photos.',
+        'images' => [
+            UploadedFile::fake()->image('photo-1.jpg'),
+            UploadedFile::fake()->image('photo-2.jpg'),
+            UploadedFile::fake()->image('photo-3.jpg'),
+            UploadedFile::fake()->image('photo-4.jpg'),
+            UploadedFile::fake()->image('photo-5.jpg'),
+        ],
+    ])->assertRedirect('/sell')->assertSessionHasErrors('images');
+
+    $this->assertDatabaseMissing('products', ['name' => 'Too many photos']);
 });
 
 test('replacing and deleting a listing removes its uploaded photos', function () {
     Storage::fake('public');
-    $oldImagePath = UploadedFile::fake()->image('old.jpg')->store('products', 'public');
+    $oldImagePaths = [
+        UploadedFile::fake()->image('old-front.jpg')->store('products', 'public'),
+        UploadedFile::fake()->image('old-side.jpg')->store('products', 'public'),
+    ];
     $product = Product::createListing([
         'name' => 'Photo frame',
         'category' => 'furniture',
         'price' => 20000,
         'location' => 'Bahan',
         'description' => 'A framed photo.',
-        'image' => $oldImagePath,
+        'image' => $oldImagePaths[0],
+        'gallery_paths' => $oldImagePaths,
     ]);
     $newPhoto = UploadedFile::fake()->image('new.jpg');
+
+    $editResponse = $this->get(route('listings.edit', $product->id));
+    foreach ($oldImagePaths as $oldImagePath) {
+        $editResponse->assertSee(Storage::disk('public')->url($oldImagePath));
+    }
 
     $this->put(route('listings.update', $product->id), [
         'name' => 'Photo frame',
@@ -281,19 +403,26 @@ test('replacing and deleting a listing removes its uploaded photos', function ()
         'location' => 'Bahan',
         'description' => 'A framed photo.',
         'status' => 'Good',
-        'image' => $newPhoto,
+        'images' => [$newPhoto, UploadedFile::fake()->image('new-side.jpg')],
     ])->assertRedirect(route('my-listings'));
 
     $updatedProduct = Product::findOrFail($product->id);
-    $newImagePath = $updatedProduct->getRawOriginal('image');
+    $newImagePaths = $updatedProduct->images()->orderBy('position')->pluck('path')->all();
 
-    Storage::disk('public')->assertMissing($oldImagePath);
-    Storage::disk('public')->assertExists($newImagePath);
+    foreach ($oldImagePaths as $oldImagePath) {
+        Storage::disk('public')->assertMissing($oldImagePath);
+    }
+    expect($newImagePaths)->toHaveCount(2);
+    foreach ($newImagePaths as $newImagePath) {
+        Storage::disk('public')->assertExists($newImagePath);
+    }
 
     $this->delete(route('listings.destroy', $product->id))
         ->assertRedirect(route('my-listings'));
 
-    Storage::disk('public')->assertMissing($newImagePath);
+    foreach ($newImagePaths as $newImagePath) {
+        Storage::disk('public')->assertMissing($newImagePath);
+    }
 });
 
 test('sellers can edit their listing and persist the changes', function () {

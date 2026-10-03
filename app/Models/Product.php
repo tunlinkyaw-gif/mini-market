@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
 {
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'gallery_urls'];
 
     protected $fillable = [
         'name',
@@ -35,6 +36,11 @@ class Product extends Model
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('position');
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         $image = $this->getRawOriginal('image');
@@ -46,6 +52,23 @@ class Product extends Model
         return Str::startsWith($image, ['http://', 'https://'])
             ? $image
             : Storage::disk('public')->url($image);
+    }
+
+    public function getGalleryUrlsAttribute(): array
+    {
+        $coverPath = $this->getRawOriginal('image');
+        $gallery = $this->relationLoaded('images')
+            ? $this->getRelation('images')
+            : collect();
+        $galleryPaths = $gallery->pluck('path')->all();
+        $coverUrl = $this->image_url;
+        $urls = $gallery->map(fn (ProductImage $image) => Storage::disk('public')->url($image->path))->all();
+
+        if ($coverUrl !== null && ! in_array($coverPath, $galleryPaths, true)) {
+            array_unshift($urls, $coverUrl);
+        }
+
+        return array_values(array_unique($urls));
     }
 
     public static function sampleProducts(): array
@@ -126,11 +149,19 @@ class Product extends Model
             'price' => (int) $data['price'],
             'location' => $data['location'],
             'description' => $data['description'],
-            'image' => $data['image'] ?? 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+            'image' => $data['gallery_paths'][0] ?? $data['image'] ?? 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
             'seller_id' => $data['seller_id'] ?? auth()->id() ?? 1,
             'status' => $status,
             'listing_status' => $data['listing_status'] ?? 'Available',
         ]);
+
+        if (! empty($data['gallery_paths'])) {
+            $record->images()->createMany(array_map(
+                fn (string $path, int $position) => ['path' => $path, 'position' => $position],
+                $data['gallery_paths'],
+                array_keys($data['gallery_paths']),
+            ));
+        }
 
         $products = self::allProducts();
         array_unshift($products, $record->toArray());
@@ -176,18 +207,20 @@ class Product extends Model
             return null;
         }
 
+        $galleryPaths = $data['gallery_paths'] ?? null;
+        $previousImage = $product->getRawOriginal('image');
+        $previousGalleryPaths = $product->images()->pluck('path')->all();
+
         $updateData = [
             'name' => $data['name'] ?? $product->name,
             'category' => $data['category'] ?? $product->category,
             'price' => isset($data['price']) ? (int) $data['price'] : $product->price,
             'location' => $data['location'] ?? $product->location,
             'description' => $data['description'] ?? $product->description,
-            'image' => $data['image'] ?? $product->image,
+            'image' => $galleryPaths[0] ?? $data['image'] ?? $product->image,
             'status' => $data['status'] ?? $data['condition'] ?? $product->status,
             'listing_status' => $data['listing_status'] ?? $product->listing_status,
         ];
-        $previousImage = $product->getRawOriginal('image');
-
         if (isset($data['name'])) {
             $updateData['slug'] = Str::slug($data['name']).'-'.$product->id;
         }
@@ -195,7 +228,18 @@ class Product extends Model
         $product->fill($updateData);
         $product->save();
 
-        if (isset($data['image']) && $data['image'] !== $previousImage) {
+        if ($galleryPaths !== null) {
+            $product->images()->delete();
+            $product->images()->createMany(array_map(
+                fn (string $path, int $position) => ['path' => $path, 'position' => $position],
+                $galleryPaths,
+                array_keys($galleryPaths),
+            ));
+
+            foreach (array_unique(array_merge([$previousImage], $previousGalleryPaths)) as $previousPath) {
+                self::deleteStoredImage($previousPath);
+            }
+        } elseif (isset($data['image']) && $data['image'] !== $previousImage) {
             self::deleteStoredImage($previousImage);
         }
 
@@ -212,10 +256,16 @@ class Product extends Model
             return false;
         }
 
+        $storedImages = array_unique(array_merge(
+            [$product->getRawOriginal('image')],
+            $product->images()->pluck('path')->all(),
+        ));
         $deleted = $product->delete();
 
         if ($deleted) {
-            self::deleteStoredImage($product->getRawOriginal('image'));
+            foreach ($storedImages as $image) {
+                self::deleteStoredImage($image);
+            }
         }
 
         session(['marketplace_products' => self::allProducts()]);

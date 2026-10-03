@@ -19,11 +19,13 @@ class MarketplaceController extends Controller
 
     public function showProduct(string $slug)
     {
-        $productRecord = Product::query()->where('slug', $slug)->first();
+        $productRecord = Product::query()->with('images')->where('slug', $slug)->first();
         $product = $productRecord?->toArray() ?? Product::findBySlug($slug) ?? Product::allProducts()[0];
         $sellerRecord = User::query()->find($product['seller_id'] ?? null);
         $isFavorite = $productRecord !== null
             && auth()->user()->favorites()->whereKey($productRecord->id)->exists();
+        $isOwner = $productRecord !== null
+            && (int) $productRecord->seller_id === (int) auth()->id();
         $seller = [
             'id' => $sellerRecord?->id ?? ($product['seller_id'] ?? 1),
             'name' => $sellerRecord?->name ?? 'Marketly seller',
@@ -38,6 +40,7 @@ class MarketplaceController extends Controller
             'seller' => $seller,
             'canFavorite' => $productRecord !== null,
             'isFavorite' => $isFavorite,
+            'isOwner' => $isOwner,
         ]);
     }
 
@@ -57,27 +60,29 @@ class MarketplaceController extends Controller
 
     public function sellerProfile(string $id)
     {
-        $seller = User::find($id) ?? [
-            'id' => $id,
-            'name' => 'Aye Chan',
-            'location' => 'Yangon',
-            'rating' => 4.9,
-            'sold' => 58,
-            'bio' => 'I sell gently used tech and lifestyle products in the city center.',
-        ];
-
+        $seller = User::query()->findOrFail($id);
         $products = Product::query()
-            ->where('seller_id', $id)
-            ->orWhere('seller_id', 1)
+            ->where('seller_id', $seller->id)
             ->latest()
             ->get()
             ->toArray();
+        $sellerProfile = [
+            'id' => $seller->id,
+            'name' => $seller->name,
+            'location' => $seller->location ?? 'Location not provided',
+            'member_since' => $seller->created_at?->format('Y') ?? 'Unknown',
+            'active_listings' => Product::query()
+                ->where('seller_id', $seller->id)
+                ->where('listing_status', 'Available')
+                ->count(),
+            'sold_listings' => Product::query()
+                ->where('seller_id', $seller->id)
+                ->where('listing_status', 'Sold')
+                ->count(),
+        ];
+        $isOwner = (int) auth()->id() === (int) $seller->id;
 
-        if (empty($products)) {
-            $products = Product::allProducts();
-        }
-
-        return view('user.seller-profile', compact('seller', 'products'));
+        return view('user.seller-profile', compact('sellerProfile', 'products', 'isOwner'));
     }
 
     public function messages()
@@ -153,6 +158,7 @@ class MarketplaceController extends Controller
     public function editListing(int $id)
     {
         $product = Product::query()
+            ->with('images')
             ->where('seller_id', auth()->id())
             ->findOrFail($id)
             ->toArray();
@@ -172,13 +178,12 @@ class MarketplaceController extends Controller
             'price' => ['required', 'integer', 'min:1'],
             'location' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'images' => ['nullable', 'array', 'max:4'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'status' => ['required', 'in:New,Like new,Good,Fair'],
         ]);
 
-        if (isset($validated['image'])) {
-            $validated['image'] = $validated['image']->store('products', 'public');
-        }
+        $validated = $this->storeListingImages($request, $validated);
 
         Product::updateListing($product->id, $validated);
 
@@ -220,16 +225,31 @@ class MarketplaceController extends Controller
             'price' => ['required', 'integer', 'min:1'],
             'location' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'images' => ['nullable', 'array', 'max:4'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'status' => ['nullable', 'string', 'max:50'],
         ]);
 
-        if (isset($validated['image'])) {
-            $validated['image'] = $validated['image']->store('products', 'public');
-        }
+        $validated = $this->storeListingImages($request, $validated);
 
         Product::createListing($validated);
 
         return redirect()->route('my-listings');
+    }
+
+    private function storeListingImages(Request $request, array $validated): array
+    {
+        $galleryPaths = collect($request->file('images', []))
+            ->map(fn ($image) => $image->store('products', 'public'))
+            ->all();
+
+        unset($validated['images']);
+
+        if ($galleryPaths !== []) {
+            $validated['image'] = $galleryPaths[0];
+            $validated['gallery_paths'] = $galleryPaths;
+        }
+
+        return $validated;
     }
 }

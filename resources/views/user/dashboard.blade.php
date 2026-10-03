@@ -20,8 +20,7 @@
       <a href="{{ route('my-listings') }}" class="hover:text-ink">My Listings</a>
     </nav>
     <div class="flex items-center gap-3">
-      <a href="{{ route('login') }}" class="hidden sm:inline text-sm font-semibold">Sign in</a>
-      <a href="{{ route('sell') }}" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">+ Create listing</a>
+      <a href="{{ route('sell') }}" class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">+ Sell item</a>
       <form action="{{ route('logout') }}" method="POST">
         @csrf
         <button type="submit" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">Logout</button>
@@ -38,7 +37,7 @@
       <h1 class="mt-5 max-w-3xl text-4xl font-black leading-tight sm:text-6xl">Great finds from people around you.</h1>
       <p class="mt-4 max-w-2xl text-lg text-slate-600">A simple local marketplace for electronics, books, fashion, furniture and more.</p>
       <div class="mt-7 flex flex-wrap gap-3">
-        <a href="{{ route('sell') }}" class="inline-flex items-center rounded-xl bg-ink px-5 py-3 font-bold text-white shadow-soft hover:bg-slate-800">Create listing</a>
+        <a href="{{ route('sell') }}" class="inline-flex items-center rounded-xl bg-ink px-5 py-3 font-bold text-white shadow-soft hover:bg-slate-800">Sell item</a>
         <a href="{{ route('my-listings') }}" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-5 py-3 font-bold text-slate-700 hover:bg-slate-50">View my listings</a>
       </div>
       <div class="mt-7 flex max-w-2xl rounded-2xl border border-slate-200 bg-white p-2 shadow-soft">

@@ -1,58 +1,166 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Marketly
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Marketly is a local marketplace web application built with Laravel. Users can browse listings, publish and manage items for sale, save favorites, view seller profiles, and message other users.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Account registration, sign-in, and sign-out.
+- Marketplace browsing with product details, categories, search, and price sorting.
+- Seller profiles with active and sold listing counts.
+- Create, edit, mark sold, and delete your own listings.
+- Upload up to four JPG, PNG, or WebP photos per listing. Each photo can be up to 5 MB.
+- Save and remove favorites. Favorites are private to each account.
+- Send text messages to sellers. Messages are stored, appear in both participants' inboxes, and are marked read when a conversation is opened.
+- Responsive Blade views styled with Tailwind CSS through its CDN script.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3 or newer with the PHP extensions required by Laravel.
+- Composer.
+- SQLite (the default local database) or another Laravel-supported database such as MySQL.
+- Node.js and npm are optional for this app's current Blade pages. The views load Tailwind from its CDN and do not use the Vite manifest.
 
-## Learning Laravel
+## Local Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+From the project directory:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The example environment uses SQLite. Create the database file if it does not already exist, then migrate and seed the database:
 
-## Contributing
+```bash
+touch database/database.sqlite
+php artisan migrate --seed
+php artisan storage:link
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Start the local development server:
 
-## Code of Conduct
+```bash
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Open the URL printed by Artisan, normally `http://127.0.0.1:8000`.
 
-## Security Vulnerabilities
+For MySQL, update the database settings in `.env` before running migrations:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mini_market
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## License
+Create the database in MySQL first. Do not run `migrate:fresh` against a database containing data; it drops tables.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Demo Account
+
+After running the seeder, the local demo account is:
+
+- Email: `test@example.com`
+- Password: `password`
+
+This is intended only for local development. Change or remove the demo credentials before deploying an application anywhere accessible to other people.
+
+## User Guide
+
+### Create an account
+
+1. Open the registration page from the sign-in screen.
+2. Enter your name, email, password and confirmation, phone number, and location.
+3. Submit the form, then sign in with the new account.
+
+### Browse and inspect listings
+
+1. Use the dashboard to browse listings.
+2. Search by product text or use a category filter. The price selector sorts the visible products.
+3. Select a product to see its photos, condition, price, location, description, and seller profile.
+4. Use the gallery thumbnails, when present, to switch the main product photo.
+5. Select **Message seller** to open a conversation. On your own listing, the product page shows **Edit listing** instead.
+
+### Sell an item
+
+1. Select **Sell item** from the dashboard or another page header.
+2. Enter the title, category, condition, price, location, and description.
+3. Choose up to four JPG, PNG, or WebP photos. Each file must be 5 MB or smaller.
+4. Select **Publish listing**. The first photo is used as the cover image; additional photos appear in the product gallery.
+
+Photos are uploaded to Laravel's `public` filesystem disk. The `storage:link` step makes them reachable by the browser.
+
+### Manage your listings
+
+Open **My Listings** to view your own listings. The **All**, **Available**, and **Sold** filters narrow the table. Use **Edit** to change listing details or replace its photo gallery, **Mark sold** to change its availability, and **Delete** to remove it.
+
+Selecting new photos while editing replaces the current gallery. Leaving the photo picker empty keeps the existing photos.
+
+### Save favorites
+
+Use the heart control on a product page to save or remove that listing. Select **Favorites** to see the listings saved by your account. Other users cannot see your saved list.
+
+### Message a seller
+
+1. Open a listing and select **Message seller**.
+2. Enter a message and select **Send**. Press Enter to submit; Shift+Enter inserts a line break.
+3. The message is stored and appears in both participants' inboxes and conversation history.
+4. Opening a conversation marks incoming messages as read.
+
+Messages are private to the two participants. Users cannot start a conversation with themselves.
+
+## Application Pages and Routes
+
+All marketplace pages require authentication. Guests are redirected to sign-in.
+
+| Page or action | Route | Purpose |
+| --- | --- | --- |
+| Home | `/` | Redirects to the dashboard when signed in, otherwise to sign-in. |
+| Sign-in | `/login` | Sign in to an existing account. |
+| Registration | `/register` | Create an account. |
+| Dashboard | `/dashboard` | Browse and search listings. |
+| Product detail | `/products/{slug}` | Inspect an item, favorite it, or contact its seller. |
+| Seller profile | `/seller/{id}` | View a seller's profile and listings. |
+| Favorites | `/favorites` | View the current user's saved listings. |
+| My Listings | `/my-listings` | Manage the signed-in user's listings. |
+| Create listing | `/sell` | Open the listing form. |
+| Messages inbox | `/messages` | View conversations. |
+| Conversation | `/messages/{id}` | View a conversation and send text messages. |
+| Sign out | `POST /logout` | End the current session. |
+
+## Data and Storage
+
+- `users`: account identity and location/contact information.
+- `products`: marketplace listing details and the cover-image path.
+- `product_images`: ordered gallery images associated with a product.
+- `favorites`: the user/product pairs saved by each account.
+- `messages`: sender, receiver, message text, timestamps, and read state.
+- Uploaded listing photos are stored under `storage/app/public/products` by default.
+
+Migrations are in `database/migrations`. Sample users and product listings are created by `database/seeders/DatabaseSeeder.php`.
+
+## Tests
+
+Run all feature and unit tests with:
+
+```bash
+php artisan test --compact
+```
+
+The tests use an in-memory SQLite database and cover authentication-facing marketplace flows, listing CRUD, multi-photo uploads and cleanup, favorites, seller visibility, and message persistence/privacy.
+
+## Troubleshooting
+
+- **Uploaded images do not load:** run `php artisan storage:link` and confirm the `public/storage` link exists. Check that the configured public disk is writable.
+- **Database connection fails:** confirm the database exists and `.env` has the correct connection values. For SQLite, ensure `database/database.sqlite` exists and is writable.
+- **A migration is pending:** run `php artisan migrate` after updating the code.
+- **Changes to `.env` have no effect:** clear cached configuration with `php artisan config:clear`.
+
+## Current Limitations
+
+- Seller verification, profile ratings, response-time statistics, and profile photos are not stored yet. The profile page avoids presenting invented values for these fields.
+- Conversation records are grouped by the other participant and are not associated with a specific product. The conversation sidebar can show the seller's latest available listing, not necessarily the exact item that started that conversation.
+- Chat supports text messages only. Attachments and real-time updates are not implemented.

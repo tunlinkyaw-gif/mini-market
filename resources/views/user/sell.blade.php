@@ -42,17 +42,19 @@
 
             <div>
                 <label class="font-bold">Photos</label>
-                <div class="mt-3 flex flex-wrap items-center gap-4">
-                    <img id="photoPreview" src="{{ isset($product) ? ($product['image_url'] ?? $product['image']) : '' }}" alt="Product photo preview" class="{{ isset($product) ? '' : 'hidden' }} h-24 w-24 rounded-2xl object-cover">
+                <div id="photoPreviewList" class="mt-3 flex flex-wrap items-center gap-3">
+                    @foreach (($product['gallery_urls'] ?? []) as $photoUrl)
+                        <img src="{{ $photoUrl }}" alt="Current product photo" class="h-24 w-24 rounded-2xl object-cover">
+                    @endforeach
                     <label for="photoInput" class="grid h-24 w-24 cursor-pointer place-items-center rounded-2xl border-2 border-dashed border-slate-300 text-center text-sm font-semibold text-slate-500">
                         <span>+ Add photo</span>
-                        <input id="photoInput" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only">
+                        <input id="photoInput" name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple class="sr-only">
                     </label>
                 </div>
-                <p class="mt-2 text-sm text-slate-500">JPG, PNG, or WebP. Maximum size 5 MB.</p>
-                @error('image')
-                    <p class="mt-2 text-sm font-semibold text-red-600">{{ $message }}</p>
-                @enderror
+                <p class="mt-2 text-sm text-slate-500">Upload up to 4 photos. JPG, PNG, or WebP, maximum 5 MB each. New photos replace the current gallery.</p>
+                @if ($errors->has('images') || $errors->has('images.0'))
+                    <p class="mt-2 text-sm font-semibold text-red-600">{{ $errors->first('images') ?: $errors->first('images.0') }}</p>
+                @endif
             </div>
 
             <div>
@@ -103,15 +105,24 @@
     </main>
     <script>
         const photoInput = document.getElementById('photoInput');
-        const photoPreview = document.getElementById('photoPreview');
+        const photoPreviewList = document.getElementById('photoPreviewList');
+        const photoPicker = photoInput.closest('label');
 
         photoInput.addEventListener('change', () => {
-            const photo = photoInput.files[0];
-
-            if (photo) {
-                photoPreview.src = URL.createObjectURL(photo);
-                photoPreview.classList.remove('hidden');
+            if (photoInput.files.length > 4) {
+                photoInput.value = '';
+                window.alert('Choose no more than four photos.');
+                return;
             }
+
+            photoPreviewList.querySelectorAll('img').forEach((preview) => preview.remove());
+            [...photoInput.files].forEach((photo) => {
+                const preview = document.createElement('img');
+                preview.src = URL.createObjectURL(photo);
+                preview.alt = 'Selected product photo';
+                preview.className = 'h-24 w-24 rounded-2xl object-cover';
+                photoPreviewList.insertBefore(preview, photoPicker);
+            });
         });
     </script>
 </body>
